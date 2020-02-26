@@ -27,7 +27,7 @@ handler = WebhookHandler(LINE_CHANNEL_SECRET)
 class Timedata(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True)
-    usertime = db.Column(db.int(60*1000), unique = True)
+    usertime = db.Column(db.Integer(60*1000), unique = True)
 
         def __init__(self,username,usertime):
             self.username = username
