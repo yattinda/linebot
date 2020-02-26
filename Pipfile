@@ -6,6 +6,10 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
+flask = "*"
+line-bot-sdk = "*"
+flask-sqlalchemy = "*"
+psycopg2-binary = "*"
 
 [requires]
 python_version = "3.6"

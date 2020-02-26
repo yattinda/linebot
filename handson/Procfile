@@ -1,1 +1,1 @@
-web: python kurohige.py
+web: python main.py

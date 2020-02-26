@@ -47,6 +47,7 @@ def callback():
     try:
         profile = line_bot_api.get_profile(event.sorce.displayName)
         usertime = line_bot_api.get_message_content(event.message.timestamp)
+        userId = line_bot_api.get_profile(event.sorce.userId)
         handler.handle(body, signature)
     except InvalidSignatureError:
         abort(400)
@@ -59,18 +60,39 @@ def start_set(time):
             time = int(time)
             #message_1をLINE上へ
             message_1 = "スタートを入力してください,開始します"
-            #if スタートが入力されたら
-            sleep(3)
-            message_2 = "スタート！"
-            start = time.time()
-            break
+            input()
+            if#startが入力されたら
+                start_status = 1
+
+
             return time
+            break
         except:
             message_1 = "ERROR!もう一度やりなおしてね！"
+            start_status = 0
 
 
 
-def timeresult(usertime,time):
+
+def time_start(start_status):
+    if start_status == 1:
+        sleep(3)
+        message_2 = "スタート！"
+        start = time.time()
+
+def get_user_status(userId):
+    user_status = db.session.query(Timedata).filter_by(user_id=user_id).first()
+    if not user_status:
+        user_status = UserStatus()
+        user_status.user_id = userId
+        user_status.usertime = usertime
+        db.session.add(user_status)
+        db.session.commit()
+    return user_status
+
+
+
+def timeresult(userId,usertime,time):
     #DBで要素ワケできないかな？DBの降順あると楽
     usertime = usertime/1000
     if usertime > time:
