@@ -45,7 +45,6 @@ def callback():
 
     # handle webhook body
     try:
-        time = line_bot_api.
         profile = line_bot_api.get_profile(event.sorce.displayName)
         usertime = line_bot_api.get_message_content(event.message.timestamp)
         handler.handle(body, signature)
@@ -58,22 +57,16 @@ def start_set(time):
     while True:
         try:
             time = int(time)
+            #message_1をLINE上へ
             message_1 = "スタートを入力してください,開始します"
+            #if スタートが入力されたら
+            sleep(3)
+            message_2 = "スタート！"
+            start = time.time()
             break
-            #スタートを受け取る動作
-            #message_1をLINEに張り出して次の動作へ
-            return message_1
             return time
         except:
             message_1 = "ERROR!もう一度やりなおしてね！"
-            return message_1
-
-def timer(time):
-    #if スタートが入力されたら 
-    sleep(3)
-    message_2 = "スタート！"
-    start = time.time()
-
 
 
 
@@ -99,7 +92,7 @@ def handle_message(event):
     db.session.add(Timedata)
     db.session.commit()
 
-    timer(start_set(event.message.text))
+    start_set(event.message.text)
 
 
 
