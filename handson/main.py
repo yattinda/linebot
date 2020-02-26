@@ -24,14 +24,14 @@ LINE_CHANNEL_SECRET = os.environ["LINE_CHANNEL_SECRET"]
 line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(LINE_CHANNEL_SECRET)
 
-class User(db.Model):
+class Timedata(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True)
-    time = db.Column(db.int(60), unique = True)
+    usertime = db.Column(db.int(60*1000), unique = True)
 
-        def __init__(self,username,time):
+        def __init__(self,username,usertime):
             self.username = username
-            self.time = time
+            self.usertime = usertime
 
 
 @app.route("/callback", methods=['POST'])
@@ -41,10 +41,13 @@ def callback():
 
     # get request body as text
     body = request.get_data(as_text=True)
-    app.logger.info("Request body: " + body)
+    app.logger.info("Request body:" + body)
 
     # handle webhook body
     try:
+        time = line_bot_api.
+        profile = line_bot_api.get_profile(event.sorce.displayName)
+        usertime = line_bot_api.get_message_content(event.message.timestamp)
         handler.handle(body, signature)
     except InvalidSignatureError:
         abort(400)
@@ -57,6 +60,8 @@ def start_set(time):
             time = int(time)
             message_1 = "スタートを入力してください,開始します"
             break
+            #スタートを受け取る動作
+            #message_1をLINEに張り出して次の動作へ
             return message_1
             return time
         except:
@@ -64,23 +69,24 @@ def start_set(time):
             return message_1
 
 def timer(time):
+    #if スタートが入力されたら 
+    sleep(3)
+    message_2 = "スタート！"
     start = time.time()
-        #timetime()でスタンプを押した人の名前と時間を記録
-        #もし全員がスタンプを押したら終了
-        #時間を超えた人は終了
+
 
 
 
 def timeresult(usertime,time):
     #DBで要素ワケできないかな？DBの降順あると楽
+    usertime = usertime/1000
     if usertime > time:
         dif_time = 9999999999999999
     elif usertime <= time:
         dif_time = time - usertime
     return dif_time
 
-def judge():
-    message_2 = ("")
+
 
 
 
@@ -88,16 +94,19 @@ def judge():
 def handle_message(event):
 
 
-    user = User(event.message.text)
-    db.session.add(user)
+    usertime = Timedata(event.message.timestamp)
+    username = Timedata(event.sorce.displayName)
+    db.session.add(Timedata)
     db.session.commit()
-    contents = db.session.query(User).all()
+
+    timer(start_set(event.message.text))
 
 
-    for content in contents:
-        messages.append(TextSendMessage(content.username))
 
-    messages =[]
+
+
+
+
 
 
 
@@ -105,7 +114,7 @@ def handle_message(event):
     line_bot_api.reply_message(
         event.reply_token,
 
-        TextSendMessage(text=finalreturn))
+        TextSendMessage(text=)
 
 
 if __name__ == "__main__":
