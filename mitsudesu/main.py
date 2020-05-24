@@ -155,6 +155,39 @@ def handle_message(event):
 
         if first + datetime.timedelta(minutes = 10) > last:
             message = "mitudesu"
+
+        elif event.message.type == "text":
+            image_list = ["mitsu1.jpg",
+                          "mitsu2.png", 
+                          "mitsu3.png", 
+                          "distnce1.jfif", 
+                          "distance2.png", 
+                          "distance3.png"]
+
+            random_image = random.choice(image_list)  
+            line_bot_api.reply_message(
+                event.reply_token,ImageSendMessage(
+                    original_content_url = "https://mitsudesu.herokuapp.com/static/images/"+random_image, 
+                    preview_image_url = "https://mitsudesu.herokuapp.com/static/images/"+random_image
+                )
+            )
+            status = True
+
+        elif event.message.type == "sticker":
+            new_lifestyle = ["new_lifestyle1.jpg",
+                             "new_lifestyle2.jpg",
+                             "new_lifestyle3.jpg",
+                             "new_lifestyle4.jpg"]
+
+            random_new_lifestyle = random.choice(new_lifestyle)
+            line_bot_api.reply_message(
+                event.reply_token,ImageSendMessage(
+                    original_content_url = "https://mitsudesu.herokuapp.com/static/images/"+random_new_lifestyle, 
+                    preview_image_url = "https://mitsudesu.herokuapp.com/static/images/"+random_new_lifestyle
+                )
+            )
+            status = True
+
     else:
         message = "hogehoge"
 
