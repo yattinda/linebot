@@ -26,7 +26,7 @@ LINE_CHANNEL_ACCESS_TOKEN = os.environ["LINE_CHANNEL_ACCESS_TOKEN"]
 LINE_CHANNEL_SECRET = os.environ["LINE_CHANNEL_SECRET"]
 
 line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
-handler = WebhookHandler(LINE_CHANNErint("+++++++++++++++++++++++++++++++++++++++;")L_SECRET)
+handler = WebhookHandler(LINE_CHANNEL_SECRET)
 
 #DB
 
@@ -113,6 +113,8 @@ def handle_message(event):
     print("**********+*++++++++++++++++++++*+*+*+*+*+*+*+")
     print(event.type)
     print("+++++++++++++++++++++++++++++++++++++++;")
+
+
     if event.type == "join":
         member_ids_res = line_bot_api.get_room_member_ids(ROOM_ID)
         print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
@@ -120,6 +122,7 @@ def handle_message(event):
         print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         if len(json.loads(member_ids_res.memberIds)) >= 1:
             message = "密です"
+
 
     elif event.message.text in getout:
         recall = Recall(event.message.text)
@@ -157,22 +160,24 @@ def handle_message(event):
             message = "mitudesu"
 
         elif event.message.type == "text":
-            image_list = ["mitsu1.jpg",
-                          "mitsu2.png", 
-                          "mitsu3.png", 
-                          "distnce1.jfif", 
-                          "distance2.png", 
+            image_list = ["mitsu1.jfif",
+                          "mitsu2.png",
+                          "mitsu3.png",
+                          "distance1.jfif"
+                          "distance2.png",
                           "distance3.png"]
 
-            random_image = random.choice(image_list)  
+            random_image = random.choice(image_list)
             line_bot_api.reply_message(
                 event.reply_token,ImageSendMessage(
-                    original_content_url = "https://mitsudesu.herokuapp.com/static/images/"+random_image, 
+                    original_content_url = "https://mitsudesu.herokuapp.com/static/images/"+random_image,
                     preview_image_url = "https://mitsudesu.herokuapp.com/static/images/"+random_image
                 )
             )
             status = True
 
+
+        """
         elif event.message.type == "sticker":
             new_lifestyle = ["new_lifestyle1.jpg",
                              "new_lifestyle2.jpg",
@@ -182,11 +187,12 @@ def handle_message(event):
             random_new_lifestyle = random.choice(new_lifestyle)
             line_bot_api.reply_message(
                 event.reply_token,ImageSendMessage(
-                    original_content_url = "https://mitsudesu.herokuapp.com/static/images/"+random_new_lifestyle, 
+                    original_content_url = "https://mitsudesu.herokuapp.com/static/images/"+random_new_lifestyle,
                     preview_image_url = "https://mitsudesu.herokuapp.com/static/images/"+random_new_lifestyle
                 )
             )
             status = True
+        """
 
     else:
         message = "hogehoge"
