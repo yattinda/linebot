@@ -7,7 +7,7 @@ from linebot.exceptions import (
     InvalidSignatureError
 )
 from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage, ImageSendMessage, VideoSendMessage, StickerSendMessage, AudioSendMessage
+    MessageEvent, TextMessage, TextSendMessage, ImageSendMessage, VideoSendMessage, StickerSendMessage, AudioSendMessage, JoinEvent
 )
 import os
 import random
@@ -51,7 +51,8 @@ getout = ["やめろ",
           "出ていけ",
           "退陣",
           "収束した",
-          "税金の無駄",
+          "税金",
+          "無駄",
           "リコール",
           "辞任",
           "いらない",
@@ -96,6 +97,28 @@ def callback():
 
     return 'OK'
 
+@handler.add(JoinEvent)
+def handle_join(event):
+    """ 課金必須
+    ROOM_ID = event.source.group_id
+    print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+    print(ROOM_ID)
+    print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+    member_ids_res = line_bot_api.get_group_member_id(ROOM_ID)
+    print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+    print(member_ids_res)
+    print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+    if len(json.loads(member_ids_res.memberIds)) >= 2:
+    """
+    msg = []
+    msg.append(TextSendMessage
+    (text="追加いただきありがとうございます\uDBC0\uDC1A\uDBC0\uDC1A\uDBC0\uDC1A\nコロナウイルスはあなたのすぐ近くに存在します\n三密を防ぎ、手洗いうがいで感染拡大を防止しましょう！")
+        )
+
+    line_bot_api.reply_message(
+    event.reply_token,
+    msg
+        )
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
@@ -115,23 +138,14 @@ def handle_message(event):
     print("+++++++++++++++++++++++++++++++++++++++;")
 
 
-    if event.type == "join":
-        member_ids_res = line_bot_api.get_room_member_ids(ROOM_ID)
-        print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-        print("member_ids_res")
-        print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-        if len(json.loads(member_ids_res.memberIds)) >= 1:
-            message = "密です"
-
-
-    elif event.message.text in getout:
+    if event.message.text in getout:
         recall = Recall(event.message.text)
         db.session.add(recall)
         db.session.commit()
         recall_log = db.session.query(Recall).all()
         if recall_log[-1].id % 5 == 0:
             line_bot_api.reply_message(
-                event.reply_token,TextSendMessage("東京改革")
+                event.reply_token,TextSendMessage("私はソーシャルメディアディスタンスをとります\n東京改革\uDBC0\uDC30\uDBC0\uDC30")
             )
             status = True
 
@@ -157,15 +171,17 @@ def handle_message(event):
         print("#######################################")
 
         if first + datetime.timedelta(minutes = 10) > last:
-            message = "mitudesu"
+            message = "三密状態です\nこれ以上の発言を控えましょう\uDBC0\uDC7E\uDBC0\uDC7E"
 
         elif event.message.type == "text":
-            image_list = ["mitsu1.jfif",
-                          "mitsu2.png",
-                          "mitsu3.png",
-                          "distance1.jfif"
-                          "distance2.png",
-                          "distance3.png"]
+            image_list = [
+                        "mitsu1.jfif",
+                        "mitsu2.png",
+                        "mitsu3.png",
+                        "distance1.jfif",
+                        "distance2.png",
+                        "distance3.png",
+                          ]
 
             random_image = random.choice(image_list)
             line_bot_api.reply_message(
