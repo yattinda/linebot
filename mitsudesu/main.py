@@ -1,13 +1,21 @@
 from flask import Flask, request, abort
 
 from linebot import (
-    LineBotApi, WebhookHandler
+    LineBotApi,
+    WebhookHandler
 )
 from linebot.exceptions import (
     InvalidSignatureError
 )
 from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage, ImageSendMessage, VideoSendMessage, StickerSendMessage, AudioSendMessage, JoinEvent
+    MessageEvent,
+    TextMessage,
+    TextSendMessage,
+    ImageSendMessage,
+    VideoSendMessage,
+    StickerSendMessage,
+    AudioSendMessage,
+    JoinEvent
 )
 import os
 import random
@@ -29,7 +37,6 @@ line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(LINE_CHANNEL_SECRET)
 
 #DB
-
 class Remark(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     room_id = db.Column(db.String, unique=False)
@@ -46,6 +53,7 @@ class Recall(db.Model):
     def __init__(self, mention):
         self.mention = mention
 
+#word list
 getout = ["やめろ",
           "かえれ",
           "出ていけ",
@@ -61,9 +69,10 @@ getout = ["やめろ",
           "石原",
           "都民ファースト",
           "ホリエモン",
-          ]
-#5分間に１０人発言
+         ]
+
 def five_minitue(contents, ROOM_ID):
+    """5分間に１０人発言したときのlistを返す"""
     count = 10
     state = 1
     list = []
@@ -97,6 +106,7 @@ def callback():
 
     return 'OK'
 
+#グループ招待イベント
 @handler.add(JoinEvent)
 def handle_join(event):
     """ 課金必須
@@ -112,7 +122,7 @@ def handle_join(event):
     """
     msg = []
     msg.append(TextSendMessage
-    (text="追加いただきありがとうございます\uDBC0\uDC1A\uDBC0\uDC1A\uDBC0\uDC1A\nコロナウイルスはあなたのすぐ近くに存在します\n三密を防ぎ、手洗いうがいで感染拡大を防止しましょう！")
+    (text="追加いただきありがとうございます\uDBC0\uDC1A\uDBC0\uDC1A\uDBC0\uDC1A\nコロナウイルスはあなたのすぐ近くに存在します！\n三密を防ぎ、手洗いうがいで感染拡大を防止しましょう！")
         )
 
     line_bot_api.reply_message(
@@ -120,24 +130,19 @@ def handle_join(event):
     msg
         )
 
+#メッセージイベント
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     status = False
-    print(event)
     ROOM_ID = event.source.group_id
     time = datetime.datetime.fromtimestamp(event.timestamp/1000)
-    print(time)
     remark = Remark(ROOM_ID, time)
     db.session.add(remark)
     db.session.commit()
     contents = db.session.query(Remark).all()
-    print("+++++++++++++++++++++++++++++++++++++++;")
-    print(contents)
-    print("**********+*++++++++++++++++++++*+*+*+*+*+*+*+")
-    print(event.type)
-    print("+++++++++++++++++++++++++++++++++++++++;")
 
 
+    #退出イベント
     if event.message.text in getout:
         recall = Recall(event.message.text)
         db.session.add(recall)
@@ -145,7 +150,7 @@ def handle_message(event):
         recall_log = db.session.query(Recall).all()
         if recall_log[-1].id % 5 == 0:
             line_bot_api.reply_message(
-                event.reply_token,TextSendMessage("私はソーシャルメディアディスタンスをとります\n東京改革\uDBC0\uDC30\uDBC0\uDC30")
+                event.reply_token,TextSendMessage("私はソーシャルメディアディスタンスをとりますね\n東京改革！！\uDBC0\uDC30\uDBC0\uDC30")
             )
             status = True
 
@@ -156,24 +161,27 @@ def handle_message(event):
                 db.session.query(Recall).delete()
                 db.session.commit()
 
-
-
-    #elif contents[-1].room_id == ROOM_ID:
-    #    message = "happy"
     elif contents[-1].room_id == ROOM_ID and contents[-1].id > 10:
 
         first = five_minitue(contents, ROOM_ID)[9]
         last = five_minitue(contents, ROOM_ID)[0]
-        print("####################################")
-        print(last)
-        print(first)
-        print(first + datetime.timedelta(minutes = 10))
-        print("#######################################")
 
         if first + datetime.timedelta(minutes = 10) > last:
             message = "三密状態です\nこれ以上の発言を控えましょう\uDBC0\uDC7E\uDBC0\uDC7E"
 
-        elif event.message.type == "text":
+        elif "密" in event.message.text and "です" in event.message.text:
+            message = "それは私のセリフです\uDBC0\uDC26\uDBC0\uDC26"
+
+        elif "コロナ" in event.message.text:
+            message = "こちらで情報を確認しましょう！\nhttps://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000164708_00001.html"
+
+        elif "corona" in event.message.text.lower():
+            message = "check the information here!\nhttps://www.who.int/emergencies/diseases/novel-coronavirus-2019"
+
+        elif "感染者数" in event.message.text:
+            message = "こちらでコロナウイルスの感染者が確認できます！\nhttps://www3.nhk.or.jp/news/special/coronavirus/data/"
+
+        else:
             image_list = [
                         "mitsu1.jfif",
                         "mitsu2.png",
@@ -181,6 +189,10 @@ def handle_message(event):
                         "distance1.jfif",
                         "distance2.png",
                         "distance3.png",
+                        "new_lifestyle1.jpg",
+                        "new_lifestyle2.jpg",
+                        "new_lifestyle3.jpg",
+                        "new_lifestyle4.jpg",
                           ]
 
             random_image = random.choice(image_list)
@@ -192,35 +204,13 @@ def handle_message(event):
             )
             status = True
 
-
-        """
-        elif event.message.type == "sticker":
-            new_lifestyle = ["new_lifestyle1.jpg",
-                             "new_lifestyle2.jpg",
-                             "new_lifestyle3.jpg",
-                             "new_lifestyle4.jpg"]
-
-            random_new_lifestyle = random.choice(new_lifestyle)
-            line_bot_api.reply_message(
-                event.reply_token,ImageSendMessage(
-                    original_content_url = "https://mitsudesu.herokuapp.com/static/images/"+random_new_lifestyle,
-                    preview_image_url = "https://mitsudesu.herokuapp.com/static/images/"+random_new_lifestyle
-                )
-            )
-            status = True
-        """
-
     else:
-        message = "hogehoge"
+        message = "Error occurred!! plz wait for a while."
 
     if status == False:
         line_bot_api.reply_message(
             event.reply_token,TextSendMessage(message)
             )
-
-
-
-
 
 if __name__ == "__main__":
 #    app.run()
