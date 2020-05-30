@@ -184,7 +184,7 @@ def handle_message(event):
             message = "こちらでコロナウイルスの感染者が確認できます！\nhttps://www3.nhk.or.jp/news/special/coronavirus/data/"
 
         else:
-            num = random.randrange(3)
+            num = random.randrange(2)
             image_list = [
                         "mitsu1.jfif",
                         "mitsu2.png",
