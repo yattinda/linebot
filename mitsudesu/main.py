@@ -72,16 +72,18 @@ getout = ["やめろ",
          ]
 
 def five_minitue(contents, ROOM_ID):
-    """5分間に１０人発言したときのlistを返す"""
+    """１０人発言したときの最新のlistを返す"""
     count = 10
     state = 1
     list = []
     while (count > 0):
-        if contents[-state].room_id == ROOM_ID:
-            list.append(contents[-state].remark_time)
-            count -= 1
-
-        state+= 1
+        try:
+            if contents[-state].room_id == ROOM_ID:
+                list.append(contents[-state].remark_time)
+                count -= 1
+            state+= 1
+        except:
+            break
 
     return(list)
 
@@ -140,7 +142,7 @@ def handle_message(event):
     db.session.add(remark)
     db.session.commit()
     contents = db.session.query(Remark).all()
-
+    group_num = len(five_minitue(contents,ROOM_ID))
 
     #退出イベント
     if event.message.text in getout:
@@ -161,12 +163,12 @@ def handle_message(event):
                 db.session.query(Recall).delete()
                 db.session.commit()
 
-    elif contents[-1].room_id == ROOM_ID and contents[-1].id > 10:
+    elif contents[-1].room_id == ROOM_ID and group_num == 10:
 
         first = five_minitue(contents, ROOM_ID)[9]
         last = five_minitue(contents, ROOM_ID)[0]
 
-        if first + datetime.timedelta(minutes = 10) > last:
+        if first + datetime.timedelta(minutes = 3) > last:
             message = "三密状態です\nこれ以上の発言を控えましょう\uDBC0\uDC7E\uDBC0\uDC7E"
 
         elif "密" in event.message.text and "です" in event.message.text:
@@ -182,6 +184,7 @@ def handle_message(event):
             message = "こちらでコロナウイルスの感染者が確認できます！\nhttps://www3.nhk.or.jp/news/special/coronavirus/data/"
 
         else:
+            num = random.randrange(2)
             image_list = [
                         "mitsu1.jfif",
                         "mitsu2.png",
@@ -194,18 +197,27 @@ def handle_message(event):
                         "new_lifestyle3.jpg",
                         "new_lifestyle4.jpg",
                           ]
-
-            random_image = random.choice(image_list)
-            line_bot_api.reply_message(
-                event.reply_token,ImageSendMessage(
-                    original_content_url = "https://mitsudesu.herokuapp.com/static/images/"+random_image,
-                    preview_image_url = "https://mitsudesu.herokuapp.com/static/images/"+random_image
-                )
-            )
+            if num == 0:
+                random_image = random.choice(image_list)
+                line_bot_api.reply_message(
+                    event.reply_token,ImageSendMessage(
+                        original_content_url = "https://mitsudesu.herokuapp.com/static/images/"+random_image,
+                        preview_image_url = "https://mitsudesu.herokuapp.com/static/images/"+random_image
+                        )
+                    )
             status = True
+    elif "コロナ" in event.message.text:
+        message = "こちらで情報を確認しましょう！\nhttps://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000164708_00001.html"
 
+    elif "corona" in event.message.text.lower():
+        message = "check the information here!\nhttps://www.who.int/emergencies/diseases/novel-coronavirus-2019"
+
+    elif "感染者数" in event.message.text:
+        message = "こちらでコロナウイルスの感染者が確認できます！\nhttps://www3.nhk.or.jp/news/special/coronavirus/data/"
     else:
-        message = "Error occurred!! plz wait for a while."
+        num = random.randrange(2)
+        if num == 0:
+            message = "このグループは比較的ソーシャルメディアディスタンスがとれています\uDBC0\uDC33\uDBC0\uDC33\uDBC0\uDC33\nこの調子で頑張ろう！"
 
     if status == False:
         line_bot_api.reply_message(
