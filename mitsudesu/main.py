@@ -185,24 +185,12 @@ def handle_message(event):
 
         else:
             num = random.randrange(2)
-            image_list = [
-                        "mitsu1.jfif",
-                        "mitsu2.png",
-                        "mitsu3.png",
-                        "distance1.jfif",
-                        "distance2.png",
-                        "distance3.png",
-                        "new_lifestyle1.jpg",
-                        "new_lifestyle2.jpg",
-                        "new_lifestyle3.jpg",
-                        "new_lifestyle4.jpg",
-                          ]
             if num == 0:
-                random_image = random.choice(image_list)
+                image_num = str(random.randrange(1,26))
                 line_bot_api.reply_message(
                     event.reply_token,ImageSendMessage(
-                        original_content_url = "https://mitsudesu.herokuapp.com/static/images/"+random_image,
-                        preview_image_url = "https://mitsudesu.herokuapp.com/static/images/"+random_image
+                        original_content_url = "https://mitsudesu.herokuapp.com/static/images/"+image_num+".png",
+                        preview_image_url = "https://mitsudesu.herokuapp.com/static/images/"+image_num+".png"
                         )
                     )
             status = True
