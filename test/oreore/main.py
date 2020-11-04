@@ -58,8 +58,8 @@ def callback():
 
 @handler.add(FollowEvent)
 def handle_join(event):
-    userid = line_bot_api.get_profile(event.source.user_id)
-    db.session.add(userid.user_id)
+    userid = User(line_bot_api.get_profile(event.source.user_id))
+    db.session.add(user_id)
     db.session.commit()
     msg = []
     msg.append(TextSendMessage(text="anan"))
@@ -69,7 +69,7 @@ def handle_join(event):
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    contents = db.session.query(User.user_id).all()
+    contents = db.session.query(User).all()
     print("###################")
     print(contents.user_id)
     print("###################")
